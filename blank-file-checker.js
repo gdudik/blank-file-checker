@@ -22,13 +22,20 @@ function getLineCount(filePath) {
 }
 
 function copyFile(source, destination) {
-  fs.copyFile(source, destination, (err) => {
-    if (err) {
-      console.error(`Error copying file: ${err.message}`);
-    } else {
-      console.log(`Copied ${source} to ${destination}`);
-    }
-  });
+  try {
+    // Read content and filter out lines starting with '-'
+    const content = fs.readFileSync(source, 'utf8');
+    const filteredLines = content
+      .split(/\r?\n/)
+      .filter(line => !line.trimStart().startsWith('-'))
+      .join('\n');
+
+    // Write filtered content to destination
+    fs.writeFileSync(destination, filteredLines);
+    console.log(`Copied ${source} to ${destination} (filtered)`);
+  } catch (err) {
+    console.error(`Error copying file: ${err.message}`);
+  }
 }
 
 // Run every 5 seconds
